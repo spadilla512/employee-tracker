@@ -2,7 +2,7 @@
 
 ## Description
 
-
+Developers frequently have to create interfaces that allow non-developers to easily view and intext with information stored in databases. These interfaces are called content management systems (CMS). The application can be accessed by entering in "npm start" in the command line.
 
 ## User Story
 
@@ -28,7 +28,7 @@ To install mysql2, use 'npm i mysql2' in terminal.
 
 ## Credits
 
-
+The structure of the functions for each question in the server.js file was based off of a repository named "EmployBase" which can be accessed through the following link: https://github.com/cynthiamory/EmployBase.git
 
 ## License
 
