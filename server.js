@@ -1,7 +1,7 @@
 const inquirer = require("inquirer");
 const mysql = require("mysql2");
 const consoleTable = require("console.table");
-const cfonts = require ("cfonts");
+
 
 const connection = mysql.createConnection({
     host: "localhost",
@@ -70,7 +70,7 @@ function tracker() {
 
 function viewAllEmployees() {
     connection.query(
-        'SELECT employees.id, employee.first_name, employee.last_name, roles.title, department.name AS department, roles.salary, CONCAT(manager.first_name, " ", manager.last_name) AS manager FROM employees LEFT JOIN roles ON employees.role_id = roles.id LEFT JOIN department ON roles.department_id = department.id LEFT JOIN employees AS manager ON employees.manager_id = manager.id',
+        'SELECT employees.id, employees.first_name, employees.last_name, roles.title, department.name AS department, roles.salary, CONCAT(manager.first_name, " ", manager.last_name) AS manager FROM employees LEFT JOIN roles ON employees.role_id = roles.id LEFT JOIN department ON roles.department_id = department.id LEFT JOIN employees AS manager ON employees.manager_id = manager.id',
         (err, res) => {
             if (err) throw err;
             console.table(res);
@@ -114,24 +114,24 @@ function addEmployee() {
                         ],
                     },
                 ])
-                .then((answers) => {
+                .then((answer) => {
                     const selectedRole = roles.find(
-                        (roles) => roles.title === answers.role
+                        (roles) => roles.title === answer.role
                     );
-                    let manager_id = null;
-                    if (answers.manager !== "None") {
+                    let managerId = null;
+                    if (answer.manager !== "None") {
                         const selectedManager = employees.find(
                             (employees) =>
                                 `${employees.first_name} ${employees.last_name}` ===
-                                answers.manager
+                                answer.manager
                         );
                         managerId = selectedManager.id;
                     }
                     connection.query(
                         "INSERT INTO employees SET ?",
                         {
-                            first_name: answers.firstName,
-                            last_name: answers.lastName,
+                            first_name: answer.firstName,
+                            last_name: answer.lastName,
                             role_id: selectedRole.id,
                             manager_id: managerId,
                         },
@@ -167,14 +167,14 @@ function updateEmployeeRole() {
                         choices: roles.map((role) => role.title),
                     },
                 ])
-                .then((answers) => {
+                .then((answer) => {
                     const selectedEmployees = employees.find(
                         (employees) =>
                             `${employees.first_name} ${employees.last_name}` ===
-                            answers.employees
+                            answer.employees
                     );
                     const selectedRole = roles.find(
-                        (role) => role.title === answers.role
+                        (role) => role.title === answer.role
                     );
 
                     connection.query(
@@ -183,6 +183,7 @@ function updateEmployeeRole() {
                         (err) => {
                             if (err) throw err;
                             console.log("Employee role is updated!");
+                            tracker();
                         }
                     );
                 });
@@ -224,15 +225,15 @@ function addRole() {
                     choices: departments.map((department) => department.name),
                 },
             ])
-            .then((answers) => {
+            .then((answer) => {
                 const selectedDepartment = departments.find(
-                    (department) => department.name === answers.department
+                    (department) => department.name === answer.department
                 );
                 connection.query(
                     "INSERT INTO roles SET ?",
                     {
-                        title: answers.title,
-                        salary: answers.salary,
+                        title: answer.title,
+                        salary: answer.salary,
                         department_id: selectedDepartment.id,
                     },
                     (err) => {
@@ -260,7 +261,7 @@ function addDepartment() {
             type: "input",
             message: "Enter department name:",
         })
-        .then((answers) => {
+        .then((answer) => {
             connection.query(
                 "INSERT INTO department SET ?",
                 {
@@ -269,6 +270,7 @@ function addDepartment() {
                 (err) => {
                     if (err) throw err;
                     console.log("Department has been added!");
+                    tracker();
                 }
             );
         });
